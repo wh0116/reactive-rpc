@@ -1,0 +1,51 @@
+server:
+  port: 2001
+spring:
+#  redis:
+#    host: 127.0.0.1
+#    port: 6379
+  application:
+    name: reactive-gateway
+  profiles:
+    active:
+    - dev
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            exposedHeaders:
+            - content-type
+            allowedHeaders: "*"
+            allowCredentials: true
+            allowedMethods:
+            - GET
+            - OPTIONS
+            - PUT
+            - DELETE
+            - POST
+      discovery:
+        locator:
+          enabled: true	#为所有服务都进行转发,新加入的服务不用去配置路由规则和重启网关
+          lowerCaseServiceId: true
+      routes:
+        - id: user-client
+          uri: lb://user-client
+          predicates:
+            - Path=/user-client/**
+
+
+
+
+
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+  client:
+    service-url:
+      defaultZone: http://admin:123456@localhost:8761/eureka/
+
+
